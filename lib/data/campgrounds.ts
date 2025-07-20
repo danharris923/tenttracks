@@ -1,0 +1,471 @@
+import type { Campground } from '@/types'
+import { searchCampflareAPI, getFeaturedCampflare, getCampflareById, checkCampflareHealth } from '@/lib/api/campflare'
+
+// Mock campground data for MVP - used as fallback when Campflare API is unavailable
+export const campgroundsData: Campground[] = [
+  {
+    id: 'yellowstone-madison',
+    slug: 'yellowstone-madison-campground',
+    name: 'Madison Campground - Yellowstone',
+    description: 'Located near the West Entrance of Yellowstone National Park, Madison Campground offers easy access to geysers, wildlife viewing, and the Madison River. Perfect for families and fishing enthusiasts.',
+    location: {
+      state: 'WY',
+      city: 'Yellowstone National Park',
+      coordinates: {
+        lat: 44.6462,
+        lng: -110.8609
+      }
+    },
+    features: ['Wildlife Viewing', 'Fishing', 'Hiking Trails', 'River Access', 'Stargazing', 'Photography'],
+    amenities: ['Restrooms', 'Fire Pits', 'Picnic Tables', 'Bear Boxes', 'Tent Sites', 'RV Accessible'],
+    rating: 4.6,
+    reviewCount: 1247,
+    images: [
+      'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?w=800',
+      'https://images.unsplash.com/photo-1470246973918-29a93221c455?w=800'
+    ],
+    priceRange: '$30-$35',
+    website: 'https://www.nps.gov/yell/planyourvisit/madisoncg.htm',
+    phone: '+1-307-344-7381'
+  },
+  {
+    id: 'yosemite-valley',
+    slug: 'yosemite-upper-pines-campground',
+    name: 'Upper Pines Campground - Yosemite Valley',
+    description: 'Located in the heart of Yosemite Valley with stunning views of Half Dome and easy access to trails. One of the most popular campgrounds in the national park system.',
+    location: {
+      state: 'CA',
+      city: 'Yosemite National Park',
+      coordinates: {
+        lat: 37.7395,
+        lng: -119.5659
+      }
+    },
+    features: ['Mountain Views', 'Hiking Trails', 'Rock Climbing', 'Photography', 'Waterfall Access', 'Wildlife Viewing'],
+    amenities: ['Restrooms', 'Showers', 'Fire Pits', 'Picnic Tables', 'Bear Boxes', 'Store/Camp Shop', 'RV Accessible'],
+    rating: 4.8,
+    reviewCount: 2341,
+    images: [
+      'https://images.unsplash.com/photo-1609788063095-d71bf3c1f01f?w=800',
+      'https://images.unsplash.com/photo-1602826347632-fc49a8675be6?w=800'
+    ],
+    priceRange: '$35-$40',
+    website: 'https://www.nps.gov/yose/planyourvisit/upperpines.htm',
+    phone: '+1-209-372-0200'
+  },
+  {
+    id: 'grand-canyon-mather',
+    slug: 'grand-canyon-mather-campground',
+    name: 'Mather Campground - Grand Canyon South Rim',
+    description: 'Located on the South Rim of the Grand Canyon, offering year-round camping with easy access to rim trails and visitor services. Book early as this campground fills quickly.',
+    location: {
+      state: 'AZ',
+      city: 'Grand Canyon Village',
+      coordinates: {
+        lat: 36.0503,
+        lng: -112.1205
+      }
+    },
+    features: ['Canyon Views', 'Hiking Trails', 'Stargazing', 'Photography', 'Visitor Center', 'Shuttle Access'],
+    amenities: ['Restrooms', 'Showers', 'Fire Pits', 'Picnic Tables', 'Laundry', 'Store/Camp Shop', 'Pet Friendly'],
+    rating: 4.5,
+    reviewCount: 1876,
+    images: [
+      'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800',
+      'https://images.unsplash.com/photo-1474623809196-26c1d33457cc?w=800'
+    ],
+    priceRange: '$18-$25',
+    website: 'https://www.nps.gov/grca/planyourvisit/cg-sr.htm',
+    phone: '+1-928-638-7888'
+  },
+  {
+    id: 'zion-watchman',
+    slug: 'zion-watchman-campground',
+    name: 'Watchman Campground - Zion National Park',
+    description: 'Located near the south entrance of Zion National Park, offering stunning red rock views and easy access to the visitor center and shuttle system.',
+    location: {
+      state: 'UT',
+      city: 'Springdale',
+      coordinates: {
+        lat: 37.1989,
+        lng: -112.9877
+      }
+    },
+    features: ['Red Rock Views', 'Hiking Trails', 'Canyon Access', 'Photography', 'Shuttle Access', 'Stargazing'],
+    amenities: ['Restrooms', 'Fire Pits', 'Picnic Tables', 'RV Accessible', 'Electrical Hookups', 'Pet Friendly'],
+    rating: 4.7,
+    reviewCount: 1543,
+    images: [
+      'https://images.unsplash.com/photo-1445308394109-4ec2920981b1?w=800',
+      'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800'
+    ],
+    priceRange: '$35-$50',
+    website: 'https://www.nps.gov/zion/planyourvisit/watchman-campground.htm',
+    phone: '+1-435-772-3256'
+  },
+  {
+    id: 'acadia-blackwoods',
+    slug: 'acadia-blackwoods-campground',
+    name: 'Blackwoods Campground - Acadia National Park',
+    description: 'A wooded campground on Mount Desert Island, offering access to ocean views, hiking trails, and the charming town of Bar Harbor.',
+    location: {
+      state: 'ME',
+      city: 'Mount Desert Island',
+      coordinates: {
+        lat: 44.3094,
+        lng: -68.2067
+      }
+    },
+    features: ['Ocean Views', 'Forest', 'Hiking Trails', 'Tide Pools', 'Wildlife Viewing', 'Photography'],
+    amenities: ['Restrooms', 'Fire Pits', 'Picnic Tables', 'Store/Camp Shop', 'Tent Sites', 'RV Accessible'],
+    rating: 4.4,
+    reviewCount: 967,
+    images: [
+      'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800',
+      'https://images.unsplash.com/photo-1533419784160-1f7f79022119?w=800'
+    ],
+    priceRange: '$22-$30',
+    website: 'https://www.nps.gov/acad/planyourvisit/blackwoods.htm',
+    phone: '+1-207-288-3338'
+  },
+  {
+    id: 'joshua-tree-jumbo',
+    slug: 'joshua-tree-jumbo-rocks-campground',
+    name: 'Jumbo Rocks Campground - Joshua Tree',
+    description: 'Famous for its massive rock formations and Joshua trees, this campground offers excellent rock climbing and desert stargazing opportunities.',
+    location: {
+      state: 'CA',
+      city: 'Twentynine Palms',
+      coordinates: {
+        lat: 33.9913,
+        lng: -116.0625
+      }
+    },
+    features: ['Rock Climbing', 'Desert', 'Stargazing', 'Photography', 'Hiking Trails', 'Rock Formations'],
+    amenities: ['Restrooms', 'Fire Pits', 'Picnic Tables', 'Tent Sites'],
+    rating: 4.6,
+    reviewCount: 1122,
+    images: [
+      'https://images.unsplash.com/photo-1455496231601-e6195da1f841?w=800',
+      'https://images.unsplash.com/photo-1517632298125-9286fb0ec603?w=800'
+    ],
+    priceRange: '$15-$20',
+    website: 'https://www.nps.gov/jotr/planyourvisit/jumborocks.htm',
+    phone: '+1-760-367-5500'
+  },
+  {
+    id: 'glacier-apgar',
+    slug: 'glacier-apgar-campground',
+    name: 'Apgar Campground - Glacier National Park',
+    description: 'Located on the shores of Lake McDonald, offering stunning mountain views and access to the Going-to-the-Sun Road.',
+    location: {
+      state: 'MT',
+      city: 'West Glacier',
+      coordinates: {
+        lat: 48.6146,
+        lng: -114.0283
+      }
+    },
+    features: ['Lake Access', 'Mountain Views', 'Hiking Trails', 'Boating', 'Fishing', 'Wildlife Viewing'],
+    amenities: ['Restrooms', 'Fire Pits', 'Picnic Tables', 'Store/Camp Shop', 'Boat Launch', 'Pet Friendly'],
+    rating: 4.7,
+    reviewCount: 1435,
+    images: [
+      'https://images.unsplash.com/photo-1564166174574-a9666f590437?w=800',
+      'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800'
+    ],
+    priceRange: '$23-$30',
+    website: 'https://www.nps.gov/glac/planyourvisit/apgarcampground.htm',
+    phone: '+1-406-888-7800'
+  },
+  {
+    id: 'smoky-mountains-cades-cove',
+    slug: 'smoky-mountains-cades-cove-campground',
+    name: 'Cades Cove Campground - Great Smoky Mountains',
+    description: 'Situated in a beautiful valley surrounded by mountains, known for wildlife viewing including black bears, deer, and wild turkeys.',
+    location: {
+      state: 'TN',
+      city: 'Townsend',
+      coordinates: {
+        lat: 35.6065,
+        lng: -83.8408
+      }
+    },
+    features: ['Wildlife Viewing', 'Mountain Views', 'Hiking Trails', 'Waterfall Access', 'Forest', 'Photography'],
+    amenities: ['Restrooms', 'Fire Pits', 'Picnic Tables', 'Store/Camp Shop', 'Tent Sites', 'RV Accessible'],
+    rating: 4.5,
+    reviewCount: 1867,
+    images: [
+      'https://images.unsplash.com/photo-1600298881974-6be191ceeda1?w=800',
+      'https://images.unsplash.com/photo-1563299796-17596ed6b017?w=800'
+    ],
+    priceRange: '$25-$27',
+    website: 'https://www.nps.gov/grsm/planyourvisit/cadescove.htm',
+    phone: '+1-865-448-4103'
+  },
+  {
+    id: 'olympic-kalaloch',
+    slug: 'olympic-kalaloch-campground',
+    name: 'Kalaloch Campground - Olympic National Park',
+    description: 'Perched on a bluff overlooking the Pacific Ocean, offering dramatic coastal views and beach access for tide pooling.',
+    location: {
+      state: 'WA',
+      city: 'Forks',
+      coordinates: {
+        lat: 47.6119,
+        lng: -124.3755
+      }
+    },
+    features: ['Beach', 'Ocean Views', 'Tide Pools', 'Hiking Trails', 'Whale Watching', 'Sunset Views'],
+    amenities: ['Restrooms', 'Fire Pits', 'Picnic Tables', 'Pet Friendly', 'Tent Sites', 'RV Accessible'],
+    rating: 4.8,
+    reviewCount: 1654,
+    images: [
+      'https://images.unsplash.com/photo-1533587851505-d119e13fa0d7?w=800',
+      'https://images.unsplash.com/photo-1573489930104-ad4d5838d0cd?w=800'
+    ],
+    priceRange: '$22-$25',
+    website: 'https://www.nps.gov/olym/planyourvisit/kalaloch-campground.htm',
+    phone: '+1-360-565-3130'
+  },
+  {
+    id: 'big-sur-pfeiffer',
+    slug: 'big-sur-pfeiffer-campground',
+    name: 'Pfeiffer Big Sur State Park Campground',
+    description: 'Nestled in a redwood forest along the Big Sur River, offering a peaceful retreat with hiking trails and river swimming holes.',
+    location: {
+      state: 'CA',
+      city: 'Big Sur',
+      coordinates: {
+        lat: 36.2469,
+        lng: -121.7825
+      }
+    },
+    features: ['Redwood Forest', 'River Access', 'Hiking Trails', 'Swimming', 'Wildlife Viewing', 'Photography'],
+    amenities: ['Restrooms', 'Showers', 'Fire Pits', 'Picnic Tables', 'Store/Camp Shop', 'WiFi'],
+    rating: 4.6,
+    reviewCount: 1298,
+    images: [
+      'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?w=800',
+      'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800'
+    ],
+    priceRange: '$35-$50',
+    website: 'https://www.parks.ca.gov/?page_id=570',
+    phone: '+1-831-667-2315'
+  }
+]
+
+// Helper functions for campground data with Campflare API integration
+
+/**
+ * Get campground by ID, checking both Campflare API and local data
+ * 
+ * Args:
+ *   id: Campground ID
+ * 
+ * Returns:
+ *   Promise<Campground | undefined>: Campground data or undefined if not found
+ */
+export async function getCampgroundById(id: string): Promise<Campground | undefined> {
+  // Check if it's a Campflare ID
+  if (id.startsWith('campflare-')) {
+    const campflareId = id.replace('campflare-', '')
+    const campground = await getCampflareById(campflareId)
+    if (campground) return campground
+  }
+  
+  // Fallback to local mock data
+  return campgroundsData.find(campground => campground.id === id)
+}
+
+/**
+ * Get campground by slug from local data only
+ * 
+ * Args:
+ *   slug: Campground slug
+ * 
+ * Returns:
+ *   Campground | undefined: Campground data or undefined if not found
+ */
+export function getCampgroundBySlug(slug: string): Campground | undefined {
+  return campgroundsData.find(campground => campground.slug === slug)
+}
+
+/**
+ * Get campgrounds by state, combining API and local data
+ * 
+ * Args:
+ *   state: State abbreviation (e.g., 'CA', 'WY')
+ * 
+ * Returns:
+ *   Promise<Campground[]>: Array of campgrounds in the state
+ */
+export async function getCampgroundsByState(state: string): Promise<Campground[]> {
+  try {
+    // First get from Campflare API
+    const apiResults = await searchCampflareAPI(`state:${state}`)
+    
+    // Also get from local data
+    const localResults = campgroundsData.filter(campground => 
+      campground.location.state.toLowerCase() === state.toLowerCase()
+    )
+    
+    // Combine and deduplicate
+    const combined = [...apiResults, ...localResults]
+    const uniqueResults = combined.filter((campground, index, array) => 
+      array.findIndex(c => c.id === campground.id) === index
+    )
+    
+    return uniqueResults
+  } catch (error) {
+    console.error('Error fetching campgrounds by state:', error)
+    // Fallback to local data only
+    return campgroundsData.filter(campground => 
+      campground.location.state.toLowerCase() === state.toLowerCase()
+    )
+  }
+}
+
+/**
+ * Get featured campgrounds, preferring API data with local fallback
+ * 
+ * Args:
+ *   limit: Maximum number of campgrounds to return (default: 6)
+ * 
+ * Returns:
+ *   Promise<Campground[]>: Array of featured campgrounds
+ */
+export async function getFeaturedCampgrounds(limit: number = 6): Promise<Campground[]> {
+  try {
+    // Check if Campflare API is available
+    const isApiHealthy = await checkCampflareHealth()
+    
+    if (isApiHealthy) {
+      // Get featured from API
+      const featuredFromApi = await getFeaturedCampflare(limit)
+      if (featuredFromApi.length > 0) {
+        return featuredFromApi
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching featured campgrounds from API:', error)
+  }
+  
+  // Fallback to local data
+  return [...campgroundsData]
+    .sort((a, b) => {
+      const scoreA = a.rating * Math.log(a.reviewCount + 1)
+      const scoreB = b.rating * Math.log(b.reviewCount + 1)
+      return scoreB - scoreA
+    })
+    .slice(0, limit)
+}
+
+/**
+ * Search campgrounds using both API and local data
+ * 
+ * Args:
+ *   query: Search query string
+ *   latitude: User latitude for location-based search
+ *   longitude: User longitude for location-based search
+ *   radius: Search radius in miles (default: 50)
+ *   limit: Maximum results to return (default: 20)
+ * 
+ * Returns:
+ *   Promise<Campground[]>: Array of matching campgrounds
+ */
+export async function searchCampgrounds(
+  query?: string,
+  latitude?: number,
+  longitude?: number,
+  radius: number = 50,
+  limit: number = 20
+): Promise<Campground[]> {
+  try {
+    // Get results from API
+    const apiResults = await searchCampflareAPI(query, latitude, longitude, radius, Math.floor(limit * 0.7))
+    
+    // Get remaining from local data if needed
+    const remainingLimit = Math.max(0, limit - apiResults.length)
+    let localResults: Campground[] = []
+    
+    if (remainingLimit > 0) {
+      localResults = campgroundsData
+        .filter(campground => {
+          if (!query) return true
+          const searchText = [
+            campground.name,
+            campground.description,
+            campground.location.city,
+            campground.location.state,
+            ...campground.features,
+            ...campground.amenities,
+          ].join(' ').toLowerCase()
+          
+          return query.toLowerCase().split(/\s+/).every(term => searchText.includes(term))
+        })
+        .slice(0, remainingLimit)
+    }
+    
+    // Combine and deduplicate
+    const combined = [...apiResults, ...localResults]
+    const uniqueResults = combined.filter((campground, index, array) => 
+      array.findIndex(c => c.id === campground.id) === index
+    )
+    
+    return uniqueResults.slice(0, limit)
+  } catch (error) {
+    console.error('Error searching campgrounds:', error)
+    // Fallback to local search only
+    if (!query) return campgroundsData.slice(0, limit)
+    
+    return campgroundsData
+      .filter(campground => {
+        const searchText = [
+          campground.name,
+          campground.description,
+          campground.location.city,
+          campground.location.state,
+          ...campground.features,
+          ...campground.amenities,
+        ].join(' ').toLowerCase()
+        
+        return query.toLowerCase().split(/\s+/).every(term => searchText.includes(term))
+      })
+      .slice(0, limit)
+  }
+}
+
+export function getRelatedCampgrounds(campground: Campground, limit: number = 4): Campground[] {
+  // Find campgrounds with similar features or in the same state
+  return campgroundsData
+    .filter(c => c.id !== campground.id)
+    .map(c => ({
+      campground: c,
+      score: calculateSimilarity(campground, c)
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map(item => item.campground)
+}
+
+function calculateSimilarity(a: Campground, b: Campground): number {
+  let score = 0
+  
+  // Same state gets high weight
+  if (a.location.state === b.location.state) score += 3
+  
+  // Common features
+  const commonFeatures = a.features.filter(f => b.features.includes(f))
+  score += commonFeatures.length * 0.5
+  
+  // Common amenities
+  const commonAmenities = a.amenities.filter(am => b.amenities.includes(am))
+  score += commonAmenities.length * 0.3
+  
+  // Similar rating
+  const ratingDiff = Math.abs(a.rating - b.rating)
+  score += (1 - ratingDiff / 5) * 2
+  
+  return score
+}
