@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import CampgroundGrid from '@/components/campgrounds/campground-grid'
 import LocationSearch from '@/components/sections/location-search'
+import Map from '@/components/ui/map'
 import { getFeaturedCampgrounds } from '@/lib/data/campgrounds'
 
 export const metadata: Metadata = {
@@ -40,10 +41,35 @@ export default async function DestinationsPage() {
         </div>
       </section>
 
-      {/* Results */}
+      {/* Map and Results */}
       <section className="section-padding">
         <div className="container">
-          <CampgroundGrid campgrounds={campgrounds} />
+          <div className="lg:grid lg:grid-cols-5 lg:gap-8">
+            {/* Map */}
+            <div className="lg:col-span-2 mb-8 lg:mb-0">
+              <div className="sticky top-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Map View</h2>
+                <Map 
+                  campgrounds={campgrounds}
+                  center={[-115.5708, 51.1784]} // Banff, Canada [longitude, latitude]
+                  className="h-96 lg:h-[600px] rounded-xl border border-gray-200"
+                />
+              </div>
+            </div>
+            
+            {/* Results */}
+            <div className="lg:col-span-3">
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {campgrounds.length} Campgrounds Found
+                </h2>
+                <p className="text-sm text-gray-600">
+                  Showing featured campgrounds across Canada and northern US
+                </p>
+              </div>
+              <CampgroundGrid campgrounds={campgrounds} />
+            </div>
+          </div>
         </div>
       </section>
     </div>

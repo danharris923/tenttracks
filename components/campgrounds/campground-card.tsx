@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils/cn'
 
 interface CampgroundCardProps {
   campground: Campground
-  distance?: number // in miles
+  distance?: number // in kilometers
   showDistance?: boolean
   className?: string
   priority?: boolean // for image loading priority
@@ -28,7 +28,7 @@ const amenityIcons = {
  * 
  * Args:
  *   campground: Campground data object
- *   distance: Distance from user location in miles
+ *   distance: Distance from user location in kilometers
  *   showDistance: Whether to display distance information
  *   className: Additional CSS classes
  *   priority: Whether to load image with priority
@@ -150,7 +150,7 @@ export default function CampgroundCard({
                 <div className="flex items-center bg-white/95 rounded-full px-2.5 py-1 shadow-sm">
                   <Navigation className="h-3.5 w-3.5 text-green-600 mr-1" />
                   <span className="text-xs font-medium text-gray-900">
-                    {distance.toFixed(1)} mi
+                    {distance.toFixed(1)} km
                   </span>
                 </div>
               </div>
@@ -192,8 +192,10 @@ export default function CampgroundCard({
 
             {/* Book Now Button - cleaner style */}
             <Link 
-              href={`/campgrounds/${slug}`}
+              href={campground.website ? `/out?url=${encodeURIComponent(campground.website)}&name=${encodeURIComponent(name)}` : '#'}
               className="block"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <button className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-2.5 px-6 rounded-xl transition-colors duration-200">
                 Book Now

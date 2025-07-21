@@ -27,8 +27,8 @@ export default async function HomePage() {
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <Image
-              src="https://images.unsplash.com/photo-1504851149312-7a075b496cc7?q=80&w=2087&auto=format&fit=crop"
-              alt="Mountain landscape with campfire"
+              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2087&auto=format&fit=crop"
+              alt="Canadian Rocky Mountains with pristine lake"
               fill
               className="object-cover"
               priority
@@ -45,7 +45,7 @@ export default async function HomePage() {
                 <span className="block text-green-400"> Campground</span>
               </h1>
               <p className="mt-6 text-lg leading-8 text-gray-200 sm:text-xl">
-                Discover amazing outdoor experiences across Canada and the United States
+                Discover amazing outdoor experiences across Canada and the northern United States
               </p>
               <div className="mt-10 max-w-2xl mx-auto">
                 <LocationSearch
@@ -74,7 +74,7 @@ export default async function HomePage() {
                 Featured Campgrounds
               </h2>
               <p className="mt-6 text-lg text-gray-600">
-                Discover handpicked camping destinations that offer the best outdoor experiences across North America
+                Discover handpicked camping destinations across Canada and the northern United States
               </p>
             </div>
 

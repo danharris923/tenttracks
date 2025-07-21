@@ -4,29 +4,104 @@ import { searchCampflareAPI, getFeaturedCampflare, getCampflareById, checkCampfl
 // Mock campground data for MVP - used as fallback when Campflare API is unavailable
 export const campgroundsData: Campground[] = [
   {
-    id: 'yellowstone-madison',
-    slug: 'yellowstone-madison-campground',
-    name: 'Madison Campground - Yellowstone',
-    description: 'Located near the West Entrance of Yellowstone National Park, Madison Campground offers easy access to geysers, wildlife viewing, and the Madison River. Perfect for families and fishing enthusiasts.',
+    id: 'banff-tunnel-mountain',
+    slug: 'banff-tunnel-mountain-campground',
+    name: 'Tunnel Mountain Campground - Banff',
+    description: 'Located in the heart of Banff National Park with stunning views of the Canadian Rockies. Close to downtown Banff and offers easy access to hiking trails and hot springs.',
     location: {
-      state: 'WY',
-      city: 'Yellowstone National Park',
+      state: 'AB',
+      city: 'Banff',
       coordinates: {
-        lat: 44.6462,
-        lng: -110.8609
+        lat: 51.1784,
+        lng: -115.5708
       }
     },
-    features: ['Wildlife Viewing', 'Fishing', 'Hiking Trails', 'River Access', 'Stargazing', 'Photography'],
+    features: ['Mountain Views', 'Hiking Trails', 'Hot Springs', 'Wildlife Viewing', 'Photography', 'Downtown Access'],
+    amenities: ['Restrooms', 'Showers', 'Fire Pits', 'Picnic Tables', 'Bear Boxes', 'Store/Camp Shop', 'RV Accessible'],
+    rating: 4.8,
+    reviewCount: 2156,
+    images: [
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+      'https://images.unsplash.com/photo-1464822759844-d150ad6c7c73?w=800'
+    ],
+    priceRange: '$35-$45 CAD',
+    website: 'https://www.pc.gc.ca/en/pn-np/ab/banff/activ/camping',
+    phone: '+1-403-762-1550'
+  },
+  {
+    id: 'lake-louise-campground',
+    slug: 'lake-louise-campground',
+    name: 'Lake Louise Campground - Banff',
+    description: 'Experience world-famous Lake Louise with turquoise waters and glacier views. Premium camping location in the Canadian Rockies with access to Chateau Lake Louise and hiking trails.',
+    location: {
+      state: 'AB',
+      city: 'Lake Louise',
+      coordinates: {
+        lat: 51.4254,
+        lng: -116.1773
+      }
+    },
+    features: ['Lake Views', 'Glacier Views', 'Hiking Trails', 'Canoeing', 'Photography', 'Mountain Access'],
+    amenities: ['Restrooms', 'Showers', 'Fire Pits', 'Picnic Tables', 'Bear Boxes', 'RV Accessible'],
+    rating: 4.9,
+    reviewCount: 1834,
+    images: [
+      'https://images.unsplash.com/photo-1503614472-8c93d56cd919?w=800',
+      'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800'
+    ],
+    priceRange: '$40-$50 CAD',
+    website: 'https://www.pc.gc.ca/en/pn-np/ab/banff/activ/camping',
+    phone: '+1-403-522-1264'
+  },
+  {
+    id: 'jasper-whistlers',
+    slug: 'jasper-whistlers-campground',
+    name: 'Whistlers Campground - Jasper',
+    description: 'Largest campground in Jasper National Park with views of the Whistlers Mountain. Perfect base for exploring the Canadian Rockies and dark sky preserve stargazing.',
+    location: {
+      state: 'AB',
+      city: 'Jasper',
+      coordinates: {
+        lat: 52.8737,
+        lng: -118.0814
+      }
+    },
+    features: ['Mountain Views', 'Dark Sky Reserve', 'Hiking Trails', 'Wildlife Viewing', 'Stargazing', 'Cycling'],
+    amenities: ['Restrooms', 'Showers', 'Fire Pits', 'Picnic Tables', 'Bear Boxes', 'Store/Camp Shop', 'RV Accessible'],
+    rating: 4.7,
+    reviewCount: 1624,
+    images: [
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+      'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800'
+    ],
+    priceRange: '$32-$42 CAD',
+    website: 'https://www.pc.gc.ca/en/pn-np/ab/jasper/activ/camping',
+    phone: '+1-780-852-6176'
+  },
+  {
+    id: 'glacier-national-park-apgar',
+    slug: 'glacier-apgar-campground',
+    name: 'Apgar Campground - Glacier National Park',
+    description: 'Located near the Canadian border in Montana with stunning mountain views. Close to the Going-to-the-Sun Road and offers easy access to hiking trails and Lake McDonald.',
+    location: {
+      state: 'MT',
+      city: 'West Glacier',
+      coordinates: {
+        lat: 48.5130,
+        lng: -113.9885
+      }
+    },
+    features: ['Mountain Views', 'Lake Access', 'Hiking Trails', 'Wildlife Viewing', 'Photography', 'Going-to-the-Sun Road'],
     amenities: ['Restrooms', 'Fire Pits', 'Picnic Tables', 'Bear Boxes', 'Tent Sites', 'RV Accessible'],
     rating: 4.6,
-    reviewCount: 1247,
+    reviewCount: 1432,
     images: [
-      'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?w=800',
-      'https://images.unsplash.com/photo-1470246973918-29a93221c455?w=800'
+      'https://images.unsplash.com/photo-1551632811-561732d1e306?w=800',
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'
     ],
-    priceRange: '$30-$35',
-    website: 'https://www.nps.gov/yell/planyourvisit/madisoncg.htm',
-    phone: '+1-307-344-7381'
+    priceRange: '$23-$30 USD',
+    website: 'https://www.nps.gov/glac/planyourvisit/apgarcampground.htm',
+    phone: '+1-406-888-7800'
   },
   {
     id: 'yosemite-valley',

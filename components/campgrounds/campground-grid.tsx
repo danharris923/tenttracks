@@ -136,12 +136,13 @@ export default function CampgroundGrid({
  *   lon1: First longitude
  *   lat2: Second latitude
  *   lon2: Second longitude
+ *   unit: 'km' or 'mi' for kilometers or miles
  * 
  * Returns:
- *   number: Distance in miles
+ *   number: Distance in kilometers or miles
  */
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 3959 // Earth's radius in miles
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number, unit: 'km' | 'mi' = 'km'): number {
+  const R = unit === 'km' ? 6371 : 3959 // Earth's radius in km or miles
   const dLat = (lat2 - lat1) * Math.PI / 180
   const dLon = (lon2 - lon1) * Math.PI / 180
   const a = 

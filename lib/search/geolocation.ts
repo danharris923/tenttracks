@@ -92,9 +92,10 @@ export function calculateDistance(
   lat1: number,
   lon1: number,
   lat2: number,
-  lon2: number
+  lon2: number,
+  unit: 'km' | 'mi' = 'km'
 ): number {
-  const R = 3958.8 // Earth's radius in miles
+  const R = unit === 'km' ? 6371 : 3958.8 // Earth's radius in km or miles
   const dLat = ((lat2 - lat1) * Math.PI) / 180
   const dLon = ((lon2 - lon1) * Math.PI) / 180
   const a =
@@ -104,7 +105,7 @@ export function calculateDistance(
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2)
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-  return R * c // Distance in miles
+  return R * c // Distance in km or miles
 }
 
 // Get user's location with fallback to IP-based location
@@ -169,7 +170,8 @@ export function isInNorthAmerica(latitude: number, longitude: number): boolean {
 export function findNearbyCampgrounds<T extends { location: { coordinates: { lat: number; lng: number } } }>(
   userLocation: GeolocationData,
   campgrounds: T[],
-  maxDistance: number = 100 // miles
+  maxDistance: number = 160, // kilometers (100 miles equivalent)
+  unit: 'km' | 'mi' = 'km'
 ): Array<T & { distance: number }> {
   return campgrounds
     .map(campground => ({
@@ -178,7 +180,8 @@ export function findNearbyCampgrounds<T extends { location: { coordinates: { lat
         userLocation.latitude,
         userLocation.longitude,
         campground.location.coordinates.lat,
-        campground.location.coordinates.lng
+        campground.location.coordinates.lng,
+        unit
       ),
     }))
     .filter(campground => campground.distance <= maxDistance)
@@ -186,12 +189,22 @@ export function findNearbyCampgrounds<T extends { location: { coordinates: { lat
 }
 
 // Format distance for display
-export function formatDistance(distance: number): string {
-  if (distance < 1) {
-    return `${(distance * 5280).toFixed(0)} ft`
-  } else if (distance < 10) {
-    return `${distance.toFixed(1)} mi`
+export function formatDistance(distance: number, unit: 'km' | 'mi' = 'km'): string {
+  if (unit === 'km') {
+    if (distance < 1) {
+      return `${(distance * 1000).toFixed(0)} m`
+    } else if (distance < 10) {
+      return `${distance.toFixed(1)} km`
+    } else {
+      return `${Math.round(distance)} km`
+    }
   } else {
-    return `${Math.round(distance)} mi`
+    if (distance < 1) {
+      return `${(distance * 5280).toFixed(0)} ft`
+    } else if (distance < 10) {
+      return `${distance.toFixed(1)} mi`
+    } else {
+      return `${Math.round(distance)} mi`
+    }
   }
 }
