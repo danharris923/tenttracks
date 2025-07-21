@@ -27,8 +27,8 @@ export default async function HomePage() {
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <Image
-              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2087&auto=format&fit=crop"
-              alt="Canadian Rocky Mountains with pristine lake"
+              src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=2070&auto=format&fit=crop"
+              alt="Campfire under starry night sky in the mountains"
               fill
               className="object-cover"
               priority
@@ -67,13 +67,13 @@ export default async function HomePage() {
         </section>
 
         {/* Featured Campgrounds Section */}
-        <section className="section-padding bg-white">
+        <section className="section-padding bg-white dark:bg-gray-800">
           <div className="container">
             <div className="mx-auto max-w-2xl text-center mb-16">
-              <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
                 Featured Campgrounds
               </h2>
-              <p className="mt-6 text-lg text-gray-600">
+              <p className="mt-6 text-lg text-gray-600 dark:text-gray-300">
                 Discover handpicked camping destinations across Canada and the northern United States
               </p>
             </div>
@@ -104,24 +104,24 @@ export default async function HomePage() {
         </section>
 
         {/* Stats Section */}
-        <section className="section-padding bg-white">
+        <section className="section-padding bg-white dark:bg-gray-800">
           <div className="container">
             <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-900 sm:text-4xl">10,000+</div>
-                <div className="mt-2 text-sm text-gray-600">Campgrounds Listed</div>
+                <div className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">10,000+</div>
+                <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">Campgrounds Listed</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-900 sm:text-4xl">50,000+</div>
-                <div className="mt-2 text-sm text-gray-600">Happy Campers</div>
+                <div className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">50,000+</div>
+                <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">Happy Campers</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-900 sm:text-4xl">25,000+</div>
-                <div className="mt-2 text-sm text-gray-600">Reviews Written</div>
+                <div className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">25,000+</div>
+                <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">Reviews Written</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-900 sm:text-4xl">1,000+</div>
-                <div className="mt-2 text-sm text-gray-600">Gear Deals</div>
+                <div className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">1,000+</div>
+                <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">Gear Deals</div>
               </div>
             </div>
           </div>

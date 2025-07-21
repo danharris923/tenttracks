@@ -395,8 +395,27 @@ export async function getCampgroundsByState(state: string): Promise<Campground[]
  *   Promise<Campground[]>: Array of featured campgrounds
  */
 export async function getFeaturedCampgrounds(limit: number = 6): Promise<Campground[]> {
-  // For now, use curated local data which provides good search functionality
-  // Future: Replace with real API when available
+  // Try the API first, fallback to local data
+  try {
+    const response = await fetch('https://api.campflare.com/campgrounds', {
+      headers: {
+        'Authorization': `Bearer ${process.env.CAMPFLARE_API_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      // Add timeout to prevent hanging
+      signal: AbortSignal.timeout(5000)
+    })
+    
+    if (response.ok) {
+      const data = await response.json()
+      console.log('✓ Successfully fetched data from Campflare API:', data)
+      // If we get data, we'll need to transform it - for now just log it
+    }
+  } catch (error) {
+    console.log('Campflare API not available, using curated data')
+  }
+  
+  // Use curated local data which provides good search functionality
   console.log(`✓ Using ${Math.min(limit, campgroundsData.length)} curated campgrounds`)
   
   return [...campgroundsData]

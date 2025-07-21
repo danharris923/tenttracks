@@ -1,7 +1,7 @@
 import type { Campground } from '@/types'
 
 // Campflare API configuration
-const CAMPFLARE_API_BASE = 'https://api.campflare.com/v1'
+const CAMPFLARE_API_BASE = 'https://api.campflare.com'
 const CAMPFLARE_TOKEN = process.env.CAMPFLARE_API_TOKEN || 'eyJ2IjoxLCJyIjoiUEFlUVpOZFJWcXR2RlI3UTJDY0Yzd0V0QUFNSmlEYllqWkk1NVZZWGdrMCIsInUiOjE5NDY5NzIzNTU1Mjc5NzA4MTZ9'
 
 interface CampflareApiCampground {

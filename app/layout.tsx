@@ -81,9 +81,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="format-detection" content="telephone=no" />
       </head>
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${inter.className} antialiased bg-gray-50 dark:bg-gray-900 transition-colors`}>
         {/* Main Application */}
-        <div id="root" className="min-h-screen bg-gray-50">
+        <div id="root" className="min-h-screen bg-gray-50 dark:bg-gray-900">
           <Navigation />
           
           <main className="pt-16 lg:pt-20">
