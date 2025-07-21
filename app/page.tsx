@@ -91,8 +91,8 @@ export default async function HomePage() {
             {/* View All Link */}
             <div className="text-center mt-12">
               <Link
-                href="/"
-                className="inline-flex items-center justify-center rounded-xl bg-green-600 px-8 py-3 text-sm font-semibold text-white shadow-lg hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
+                href="/destinations"
+                className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-8 py-3 text-sm font-semibold text-white shadow-lg hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
               >
                 View All Campgrounds
                 <svg className="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,14 +148,14 @@ export default async function HomePage() {
               </p>
               <div className="mt-10 flex items-center justify-center gap-x-6">
                 <Link
-                  href="/"
-                  className="rounded-md bg-green-500 px-8 py-3 text-lg font-semibold text-white shadow-sm hover:bg-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-400 transition-colors"
+                  href="/destinations"
+                  className="rounded-xl bg-white px-8 py-3 text-lg font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-colors"
                 >
                   Explore Campgrounds
                 </Link>
                 <Link
                   href="/gear-deals"
-                  className="text-lg font-semibold leading-6 text-white hover:text-green-400 transition-colors"
+                  className="text-lg font-semibold leading-6 text-white hover:text-gray-300 transition-colors"
                 >
                   Browse Gear Deals <span aria-hidden="true">→</span>
                 </Link>
