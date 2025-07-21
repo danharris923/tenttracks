@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import LocationSearch from '@/components/sections/location-search'
+import HeroSearch from '@/components/sections/hero-search'
 import CampgroundCard from '@/components/campgrounds/campground-card'
 import { getFeaturedCampgrounds } from '@/lib/data/campgrounds'
 
@@ -27,8 +27,8 @@ export default async function HomePage() {
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <Image
-              src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=2070&auto=format&fit=crop"
-              alt="Campfire under starry night sky in the mountains"
+              src="https://images.unsplash.com/photo-1504851149312-7a075b496cc7?q=80&w=2070&auto=format&fit=crop"
+              alt="Campfire at campsite with tent and marshmallows under starry sky"
               fill
               className="object-cover"
               priority
@@ -48,7 +48,7 @@ export default async function HomePage() {
                 Discover amazing outdoor experiences across Canada and the northern United States
               </p>
               <div className="mt-10 max-w-2xl mx-auto">
-                <LocationSearch
+                <HeroSearch
                   placeholder="Search by state, province, or campground name..."
                   className="mb-6"
                 />

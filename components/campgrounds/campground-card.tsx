@@ -190,15 +190,15 @@ export default function CampgroundCard({
               </div>
             </div>
 
-            {/* Book Now Button - cleaner style */}
+            {/* Book Now Button - direct to booking */}
             <Link 
-              href={campground.website ? `/out?url=${encodeURIComponent(campground.website)}&name=${encodeURIComponent(name)}` : '#'}
+              href={campground.website || '#'}
               className="block"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <button className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-2.5 px-6 rounded-xl transition-colors duration-200">
-                Book Now
+              <button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200 shadow-sm">
+                Book Now on Recreation.gov
               </button>
             </Link>
           </div>

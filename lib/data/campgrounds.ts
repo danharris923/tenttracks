@@ -1,5 +1,6 @@
 import type { Campground } from '@/types'
 import { getCampflareById } from '@/lib/api/campflare'
+import { searchRecreationGov, getPopularRecreationGov } from '@/lib/api/recreation-gov'
 
 // Mock campground data for MVP - used as fallback when Campflare API is unavailable
 export const campgroundsData: Campground[] = [
@@ -125,8 +126,33 @@ export const campgroundsData: Campground[] = [
       'https://images.unsplash.com/photo-1602826347632-fc49a8675be6?w=800'
     ],
     priceRange: '$35-$40',
-    website: 'https://www.nps.gov/yose/planyourvisit/upperpines.htm',
+    website: 'https://www.recreation.gov/camping/campgrounds/232447',
     phone: '+1-209-372-0200'
+  },
+  {
+    id: 'kirk-creek',
+    slug: 'kirk-creek-campground',
+    name: 'Kirk Creek Campground - Big Sur',
+    description: 'Perched on dramatic bluffs above the Pacific Ocean, Kirk Creek offers breathtaking ocean views and direct beach access. Perfect for sunset watching and whale spotting.',
+    location: {
+      state: 'CA',
+      city: 'Big Sur',
+      coordinates: {
+        lat: 35.9741,
+        lng: -121.4618
+      }
+    },
+    features: ['Ocean Views', 'Beach Access', 'Sunset Views', 'Whale Watching', 'Photography', 'Hiking Trails'],
+    amenities: ['Restrooms', 'Fire Rings', 'Picnic Tables', 'Potable Water'],
+    rating: 4.7,
+    reviewCount: 1456,
+    images: [
+      'https://images.unsplash.com/photo-1533587851505-d119e13fa0d7?w=800',
+      'https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800'
+    ],
+    priceRange: '$35',
+    website: 'https://www.recreation.gov/camping/campgrounds/233116',
+    phone: '+1-805-434-1996'
   },
   {
     id: 'grand-canyon-mather',
@@ -395,27 +421,18 @@ export async function getCampgroundsByState(state: string): Promise<Campground[]
  *   Promise<Campground[]>: Array of featured campgrounds
  */
 export async function getFeaturedCampgrounds(limit: number = 6): Promise<Campground[]> {
-  // Try the API first, fallback to local data
+  // Try Recreation.gov API first for real data
   try {
-    const response = await fetch('https://api.campflare.com/campgrounds', {
-      headers: {
-        'Authorization': `Bearer ${process.env.CAMPFLARE_API_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      // Add timeout to prevent hanging
-      signal: AbortSignal.timeout(5000)
-    })
-    
-    if (response.ok) {
-      const data = await response.json()
-      console.log('✓ Successfully fetched data from Campflare API:', data)
-      // If we get data, we'll need to transform it - for now just log it
+    const recreationResults = await getPopularRecreationGov(limit)
+    if (recreationResults.length > 0) {
+      console.log(`✓ Using ${recreationResults.length} campgrounds from Recreation.gov`)
+      return recreationResults
     }
   } catch (error) {
-    console.log('Campflare API not available, using curated data')
+    console.error('Recreation.gov API error:', error)
   }
   
-  // Use curated local data which provides good search functionality
+  // Fallback to curated local data
   console.log(`✓ Using ${Math.min(limit, campgroundsData.length)} curated campgrounds`)
   
   return [...campgroundsData]
@@ -444,10 +461,23 @@ export async function searchCampgrounds(
   query?: string,
   latitude?: number,
   longitude?: number,
-  radius: number = 80, // 80km default for Canadian focus
+  radius: number = 80, // 80km default for Canadian focus  
   limit: number = 20
 ): Promise<Campground[]> {
-  // Enhanced local search with location-based filtering
+  // Try Recreation.gov API first for real search results
+  try {
+    const radiusInMiles = radius * 0.621371 // Convert km to miles for API
+    const recreationResults = await searchRecreationGov(query, latitude, longitude, radiusInMiles, limit)
+    
+    if (recreationResults.length > 0) {
+      console.log(`✓ Found ${recreationResults.length} campgrounds from Recreation.gov`)
+      return recreationResults
+    }
+  } catch (error) {
+    console.error('Recreation.gov search error:', error)
+  }
+  
+  // Fallback to enhanced local search
   let results = [...campgroundsData]
   
   // Apply text search filter
@@ -492,7 +522,7 @@ export async function searchCampgrounds(
   }
   
   const finalResults = results.slice(0, limit)
-  console.log(`✓ Found ${finalResults.length} campgrounds matching search criteria`)
+  console.log(`✓ Found ${finalResults.length} campgrounds from local search`)
   
   return finalResults
 }

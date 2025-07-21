@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import CampgroundGrid from '@/components/campgrounds/campground-grid'
 import LocationSearch from '@/components/sections/location-search'
 import Map from '@/components/ui/map'
-import { getFeaturedCampgrounds } from '@/lib/data/campgrounds'
+import { getFeaturedCampgrounds, searchCampgrounds } from '@/lib/data/campgrounds'
 
 export const metadata: Metadata = {
   title: 'Find Campgrounds | TentTracks',
@@ -14,8 +14,15 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function DestinationsPage() {
-  const campgrounds = await getFeaturedCampgrounds(12) // Show more campgrounds on destinations page
+interface DestinationsPageProps {
+  searchParams: { search?: string }
+}
+
+export default async function DestinationsPage({ searchParams }: DestinationsPageProps) {
+  const searchQuery = searchParams.search
+  const campgrounds = searchQuery 
+    ? await searchCampgrounds(searchQuery, undefined, undefined, 160, 12)
+    : await getFeaturedCampgrounds(12) // Show more campgrounds on destinations page
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -64,7 +71,10 @@ export default async function DestinationsPage() {
                   {campgrounds.length} Campgrounds Found
                 </h2>
                 <p className="text-sm text-gray-600">
-                  Showing featured campgrounds across Canada and northern US
+                  {searchQuery 
+                    ? `Search results for "${searchQuery}"` 
+                    : 'Showing featured campgrounds across Canada and northern US'
+                  }
                 </p>
               </div>
               <CampgroundGrid campgrounds={campgrounds} />
