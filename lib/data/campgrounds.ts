@@ -1,5 +1,5 @@
 import type { Campground } from '@/types'
-import { searchCampflareAPI, getFeaturedCampflare, getCampflareById, checkCampflareHealth } from '@/lib/api/campflare'
+import { getCampflareById } from '@/lib/api/campflare'
 
 // Mock campground data for MVP - used as fallback when Campflare API is unavailable
 export const campgroundsData: Campground[] = [
@@ -376,29 +376,13 @@ export function getCampgroundBySlug(slug: string): Campground | undefined {
  *   Promise<Campground[]>: Array of campgrounds in the state
  */
 export async function getCampgroundsByState(state: string): Promise<Campground[]> {
-  try {
-    // First get from Campflare API
-    const apiResults = await searchCampflareAPI(`state:${state}`)
-    
-    // Also get from local data
-    const localResults = campgroundsData.filter(campground => 
-      campground.location.state.toLowerCase() === state.toLowerCase()
-    )
-    
-    // Combine and deduplicate
-    const combined = [...apiResults, ...localResults]
-    const uniqueResults = combined.filter((campground, index, array) => 
-      array.findIndex(c => c.id === campground.id) === index
-    )
-    
-    return uniqueResults
-  } catch (error) {
-    console.error('Error fetching campgrounds by state:', error)
-    // Fallback to local data only
-    return campgroundsData.filter(campground => 
-      campground.location.state.toLowerCase() === state.toLowerCase()
-    )
-  }
+  // Filter local data by state
+  const results = campgroundsData.filter(campground => 
+    campground.location.state.toLowerCase() === state.toLowerCase()
+  )
+  
+  console.log(`✓ Found ${results.length} campgrounds in ${state}`)
+  return results
 }
 
 /**
@@ -411,22 +395,10 @@ export async function getCampgroundsByState(state: string): Promise<Campground[]
  *   Promise<Campground[]>: Array of featured campgrounds
  */
 export async function getFeaturedCampgrounds(limit: number = 6): Promise<Campground[]> {
-  try {
-    // Check if Campflare API is available
-    const isApiHealthy = await checkCampflareHealth()
-    
-    if (isApiHealthy) {
-      // Get featured from API
-      const featuredFromApi = await getFeaturedCampflare(limit)
-      if (featuredFromApi.length > 0) {
-        return featuredFromApi
-      }
-    }
-  } catch (error) {
-    console.error('Error fetching featured campgrounds from API:', error)
-  }
+  // For now, use curated local data which provides good search functionality
+  // Future: Replace with real API when available
+  console.log(`✓ Using ${Math.min(limit, campgroundsData.length)} curated campgrounds`)
   
-  // Fallback to local data
   return [...campgroundsData]
     .sort((a, b) => {
       const scoreA = a.rating * Math.log(a.reviewCount + 1)
@@ -453,62 +425,70 @@ export async function searchCampgrounds(
   query?: string,
   latitude?: number,
   longitude?: number,
-  radius: number = 50,
+  radius: number = 80, // 80km default for Canadian focus
   limit: number = 20
 ): Promise<Campground[]> {
-  try {
-    // Get results from API
-    const apiResults = await searchCampflareAPI(query, latitude, longitude, radius, Math.floor(limit * 0.7))
-    
-    // Get remaining from local data if needed
-    const remainingLimit = Math.max(0, limit - apiResults.length)
-    let localResults: Campground[] = []
-    
-    if (remainingLimit > 0) {
-      localResults = campgroundsData
-        .filter(campground => {
-          if (!query) return true
-          const searchText = [
-            campground.name,
-            campground.description,
-            campground.location.city,
-            campground.location.state,
-            ...campground.features,
-            ...campground.amenities,
-          ].join(' ').toLowerCase()
-          
-          return query.toLowerCase().split(/\s+/).every(term => searchText.includes(term))
-        })
-        .slice(0, remainingLimit)
-    }
-    
-    // Combine and deduplicate
-    const combined = [...apiResults, ...localResults]
-    const uniqueResults = combined.filter((campground, index, array) => 
-      array.findIndex(c => c.id === campground.id) === index
-    )
-    
-    return uniqueResults.slice(0, limit)
-  } catch (error) {
-    console.error('Error searching campgrounds:', error)
-    // Fallback to local search only
-    if (!query) return campgroundsData.slice(0, limit)
-    
-    return campgroundsData
-      .filter(campground => {
-        const searchText = [
-          campground.name,
-          campground.description,
-          campground.location.city,
-          campground.location.state,
-          ...campground.features,
-          ...campground.amenities,
-        ].join(' ').toLowerCase()
-        
-        return query.toLowerCase().split(/\s+/).every(term => searchText.includes(term))
-      })
-      .slice(0, limit)
+  // Enhanced local search with location-based filtering
+  let results = [...campgroundsData]
+  
+  // Apply text search filter
+  if (query && query.trim()) {
+    const searchTerms = query.toLowerCase().trim().split(/\s+/)
+    results = results.filter(campground => {
+      const searchText = [
+        campground.name,
+        campground.description,
+        campground.location.city,
+        campground.location.state,
+        ...campground.features,
+        ...campground.amenities,
+      ].join(' ').toLowerCase()
+      
+      return searchTerms.every(term => searchText.includes(term))
+    })
   }
+  
+  // Apply location-based filtering if coordinates provided
+  if (latitude && longitude) {
+    results = results
+      .map(campground => ({
+        ...campground,
+        distance: calculateDistance(
+          latitude,
+          longitude,
+          campground.location.coordinates.lat,
+          campground.location.coordinates.lng,
+          'km'
+        )
+      }))
+      .filter(campground => campground.distance <= radius)
+      .sort((a, b) => a.distance - b.distance)
+  } else {
+    // Sort by rating if no location provided
+    results = results.sort((a, b) => {
+      const scoreA = a.rating * Math.log(a.reviewCount + 1)
+      const scoreB = b.rating * Math.log(b.reviewCount + 1)
+      return scoreB - scoreA
+    })
+  }
+  
+  const finalResults = results.slice(0, limit)
+  console.log(`✓ Found ${finalResults.length} campgrounds matching search criteria`)
+  
+  return finalResults
+}
+
+// Helper function for distance calculation
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number, unit: 'km' | 'mi' = 'km'): number {
+  const R = unit === 'km' ? 6371 : 3959 // Earth's radius
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLon = (lon2 - lon1) * Math.PI / 180
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  return R * c
 }
 
 export function getRelatedCampgrounds(campground: Campground, limit: number = 4): Campground[] {
