@@ -2,10 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { MapPin, Star, Phone, ExternalLink, Navigation } from 'lucide-react'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { MapPin, Star, Navigation, Wifi, Car, TreesIcon as Trees, Zap, Flame } from 'lucide-react'
 import type { Campground } from '@/types'
 import { cn } from '@/lib/utils/cn'
 
@@ -15,6 +12,15 @@ interface CampgroundCardProps {
   showDistance?: boolean
   className?: string
   priority?: boolean // for image loading priority
+}
+
+const amenityIcons = {
+  wifi: Wifi,
+  parking: Car,
+  restrooms: Trees,
+  electricity: Zap,
+  'fire rings': Flame,
+  'fire pits': Flame,
 }
 
 /**
@@ -42,14 +48,11 @@ export default function CampgroundCard({
     name,
     description,
     location,
-    features,
     amenities,
     rating,
     reviewCount,
     images,
     priceRange,
-    website,
-    phone,
   } = campground
 
   // Generate JSON-LD structured data for SEO
@@ -83,9 +86,18 @@ export default function CampgroundCard({
       '@type': 'LocationFeatureSpecification',
       name: amenity,
     })),
-    ...(website && { url: website }),
-    ...(phone && { telephone: phone }),
   }
+
+  // Get amenity display info
+  const displayAmenities = amenities.slice(0, 3).map(amenity => {
+    const IconComponent = amenityIcons[amenity.toLowerCase() as keyof typeof amenityIcons]
+    return {
+      name: amenity.charAt(0).toUpperCase() + amenity.slice(1),
+      icon: IconComponent
+    }
+  })
+
+  const remainingCount = amenities.length > 3 ? amenities.length - 3 : 0
 
   return (
     <>
@@ -97,145 +109,101 @@ export default function CampgroundCard({
         }}
       />
 
-      <Card className={cn('overflow-hidden hover:shadow-lg transition-shadow duration-300', className)}>
-        {/* Image Section */}
-        <div className="relative h-48 md:h-56">
-          <Image
-            src={images[0]}
-            alt={`${name} campground`}
-            fill
-            className="object-cover"
-            priority={priority}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
+      <div className={cn('group cursor-pointer', className)}>
+        {/* Card with organic rounded shape inspired by HipCamp */}
+        <div className="relative bg-white rounded-[2rem] overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
           
-          {/* Distance Badge */}
-          {showDistance && distance && (
-            <Badge
-              variant="secondary"
-              className="absolute top-3 left-3 bg-white/90 text-gray-800"
-            >
-              <Navigation className="h-3 w-3 mr-1" />
-              {distance.toFixed(1)} mi
-            </Badge>
-          )}
-
-          {/* Rating Badge */}
-          <Badge
-            variant="secondary"
-            className="absolute top-3 right-3 bg-white/90 text-gray-800"
-          >
-            <Star className="h-3 w-3 mr-1 fill-yellow-400 text-yellow-400" />
-            {rating}
-          </Badge>
-        </div>
-
-        {/* Content Section */}
-        <div className="p-4 md:p-6">
-          {/* Header */}
-          <div className="mb-3">
-            <h3 className="text-lg md:text-xl font-semibold text-gray-900 line-clamp-2 mb-2">
-              {name}
-            </h3>
+          {/* Image Container with organic shape */}
+          <div className="relative h-64 overflow-hidden">
+            <Image
+              src={images[0]}
+              alt={`${name} campground`}
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              priority={priority}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
             
-            <div className="flex items-center text-sm text-gray-600 mb-2">
-              <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
-              <span className="truncate">
-                {location.city}, {location.state}
-              </span>
+            {/* Overlay gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            
+            {/* Heart/Favorite Button */}
+            <button className="absolute top-4 right-4 rounded-full bg-white/90 p-2.5 text-gray-600 shadow-lg transition-all duration-200 hover:bg-white hover:text-red-500 hover:scale-110">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </button>
+
+            {/* Rating Badge */}
+            <div className="absolute top-4 left-4">
+              <div className="flex items-center bg-white/90 rounded-full px-3 py-1.5 shadow-lg">
+                <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
+                <span className="text-sm font-medium text-gray-900">
+                  {rating}
+                </span>
+              </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center text-sm text-gray-600">
-                <Star className="h-4 w-4 mr-1 fill-yellow-400 text-yellow-400" />
-                <span className="font-medium">{rating}</span>
-                <span className="mx-1">•</span>
-                <span>{reviewCount.toLocaleString()} reviews</span>
+            {/* Distance Badge */}
+            {showDistance && distance && (
+              <div className="absolute bottom-4 left-4">
+                <div className="flex items-center bg-white/90 rounded-full px-3 py-1.5 shadow-lg">
+                  <Navigation className="h-4 w-4 text-green-600 mr-1" />
+                  <span className="text-sm font-medium text-gray-900">
+                    {distance.toFixed(1)} mi
+                  </span>
+                </div>
               </div>
-              
-              <div className="text-sm font-semibold text-primary-600">
-                {priceRange}/night
-              </div>
-            </div>
+            )}
           </div>
 
-          {/* Description */}
-          <p className="text-sm text-gray-600 line-clamp-3 mb-4">
-            {description}
-          </p>
-
-          {/* Features */}
-          <div className="mb-4">
-            <div className="flex flex-wrap gap-1">
-              {features.slice(0, 3).map((feature) => (
-                <Badge
-                  key={feature}
-                  variant="outline"
-                  size="sm"
-                  className="text-xs"
-                >
-                  {feature}
-                </Badge>
-              ))}
-              {features.length > 3 && (
-                <Badge variant="outline" size="sm" className="text-xs">
-                  +{features.length - 3} more
-                </Badge>
-              )}
+          {/* Content */}
+          <div className="p-6">
+            {/* Header */}
+            <div className="mb-4">
+              <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors line-clamp-1">
+                {name}
+              </h3>
+              <div className="flex items-center text-gray-600 mb-3">
+                <MapPin className="h-4 w-4 mr-1.5 flex-shrink-0 text-green-600" />
+                <span className="text-sm font-medium">{location.city}, {location.state}</span>
+              </div>
             </div>
-          </div>
 
-          {/* Actions */}
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              {phone && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  asChild
-                  className="p-2"
-                >
-                  <a
-                    href={`tel:${phone}`}
-                    aria-label={`Call ${name}`}
-                  >
-                    <Phone className="h-4 w-4" />
-                  </a>
-                </Button>
-              )}
-              
-              {website && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  asChild
-                  className="p-2"
-                >
-                  <a
-                    href={website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Visit ${name} website`}
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </Button>
+            {/* Description */}
+            <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
+              {description}
+            </p>
+
+            {/* Amenities */}
+            <div className="mb-6">
+              <div className="flex flex-wrap items-center gap-3 mb-2">
+                {displayAmenities.map((amenity, index) => (
+                  <div key={index} className="flex items-center text-gray-700">
+                    {amenity.icon && <amenity.icon className="h-4 w-4 mr-1.5 text-green-600" />}
+                    <span className="text-sm font-medium">{amenity.name}</span>
+                  </div>
+                ))}
+              </div>
+              {remainingCount > 0 && (
+                <span className="text-xs text-gray-500 font-medium">
+                  +{remainingCount} more
+                </span>
               )}
             </div>
 
-            <Button
-              variant="primary"
-              size="sm"
-              asChild
-              className="flex-shrink-0"
+            {/* Book Now Button */}
+            <Link 
+              href={`/campgrounds/${slug}`}
+              className="block"
             >
-              <Link href={`/campgrounds/${slug}`}>
-                View Details
-              </Link>
-            </Button>
+              <button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95">
+                Book Now
+              </button>
+            </Link>
           </div>
         </div>
-      </Card>
+      </div>
     </>
   )
 }
@@ -243,26 +211,22 @@ export default function CampgroundCard({
 // Skeleton loader for campground cards
 export function CampgroundCardSkeleton({ className }: { className?: string }) {
   return (
-    <Card className={cn('overflow-hidden', className)}>
-      <div className="h-48 md:h-56 bg-gray-200 animate-pulse" />
-      <div className="p-4 md:p-6">
-        <div className="h-6 bg-gray-200 rounded animate-pulse mb-2" />
-        <div className="h-4 bg-gray-200 rounded animate-pulse mb-2 w-3/4" />
-        <div className="h-4 bg-gray-200 rounded animate-pulse mb-4 w-1/2" />
-        <div className="h-16 bg-gray-200 rounded animate-pulse mb-4" />
-        <div className="flex gap-2 mb-4">
-          <div className="h-6 bg-gray-200 rounded animate-pulse w-16" />
-          <div className="h-6 bg-gray-200 rounded animate-pulse w-20" />
-          <div className="h-6 bg-gray-200 rounded animate-pulse w-14" />
-        </div>
-        <div className="flex justify-between items-center">
-          <div className="flex gap-2">
-            <div className="h-8 w-8 bg-gray-200 rounded animate-pulse" />
-            <div className="h-8 w-8 bg-gray-200 rounded animate-pulse" />
+    <div className={cn('group cursor-pointer', className)}>
+      <div className="relative bg-white rounded-[2rem] overflow-hidden shadow-lg">
+        <div className="h-64 bg-gray-200 animate-pulse" />
+        <div className="p-6">
+          <div className="h-6 bg-gray-200 rounded animate-pulse mb-2" />
+          <div className="h-4 bg-gray-200 rounded animate-pulse mb-3 w-3/4" />
+          <div className="h-4 bg-gray-200 rounded animate-pulse mb-4 w-1/2" />
+          <div className="h-16 bg-gray-200 rounded animate-pulse mb-6" />
+          <div className="flex gap-3 mb-6">
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-16" />
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-20" />
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-14" />
           </div>
-          <div className="h-8 bg-gray-200 rounded animate-pulse w-24" />
+          <div className="h-12 bg-gray-200 rounded-xl animate-pulse" />
         </div>
       </div>
-    </Card>
+    </div>
   )
 }

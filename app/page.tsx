@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import LocationSearch from '@/components/sections/location-search'
-import CampgroundGrid from '@/components/campgrounds/campground-grid'
+import CampgroundCard from '@/components/campgrounds/campground-card'
+import { getFeaturedCampgrounds } from '@/lib/data/campgrounds'
 
 export const metadata: Metadata = {
   title: 'Find the Perfect Campground & Camping Gear',
@@ -15,7 +16,9 @@ export const metadata: Metadata = {
   },
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const featuredCampgrounds = await getFeaturedCampgrounds(4)
+  
   return (
 
       <div className="min-h-screen">
@@ -64,141 +67,38 @@ export default function HomePage() {
         </section>
 
         {/* Featured Campgrounds Section */}
-        <section className="section-padding bg-gray-900">
+        <section className="section-padding bg-white">
           <div className="container">
             <div className="mx-auto max-w-2xl text-center mb-16">
-              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
                 Featured Campgrounds
               </h2>
-              <p className="mt-6 text-lg text-gray-300">
+              <p className="mt-6 text-lg text-gray-600">
                 Discover handpicked camping destinations that offer the best outdoor experiences across North America
               </p>
             </div>
 
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {/* Yosemite Valley */}
-              <div className="group relative overflow-hidden rounded-2xl bg-gray-800">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <Image
-                    src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=800&auto=format&fit=crop"
-                    alt="Yosemite Valley Campground"
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <button className="absolute top-4 right-4 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
-                    </svg>
-                  </button>
-                  <h3 className="text-xl font-bold text-white mb-2">Yosemite Valley Campground</h3>
-                  <p className="text-sm text-gray-300 mb-3 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    Yosemite National Park, California
-                  </p>
-                  <p className="text-sm text-gray-400 leading-relaxed">
-                    Experience the iconic granite cliffs and waterfalls of Yosemite Valley...
-                  </p>
-                </div>
-              </div>
+              {featuredCampgrounds.map((campground, index) => (
+                <CampgroundCard
+                  key={campground.id}
+                  campground={campground}
+                  priority={index < 2} // Priority load for first 2 images
+                />
+              ))}
+            </div>
 
-              {/* Banff National Park */}
-              <div className="group relative overflow-hidden rounded-2xl bg-gray-800">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <Image
-                    src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=800&auto=format&fit=crop"
-                    alt="Banff National Park Campground"
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <button className="absolute top-4 right-4 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
-                    </svg>
-                  </button>
-                  <h3 className="text-xl font-bold text-white mb-2">Banff National Park Campground</h3>
-                  <p className="text-sm text-gray-300 mb-3 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    Banff, Alberta
-                  </p>
-                  <p className="text-sm text-gray-400 leading-relaxed">
-                    Nestled in the heart of the Canadian Rockies, this campground offers breathtaking mountain views...
-                  </p>
-                </div>
-              </div>
-
-              {/* Acadia Oceanside */}
-              <div className="group relative overflow-hidden rounded-2xl bg-gray-800">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <Image
-                    src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=800&auto=format&fit=crop"
-                    alt="Acadia Oceanside Camping"
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <button className="absolute top-4 right-4 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
-                    </svg>
-                  </button>
-                  <h3 className="text-xl font-bold text-white mb-2">Acadia Oceanside Camping</h3>
-                  <p className="text-sm text-gray-300 mb-3 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    Bar Harbor, Maine
-                  </p>
-                  <p className="text-sm text-gray-400 leading-relaxed">
-                    Wake up to the sound of waves crashing against rugged coastlines. Perfect for those seeking a coastal...
-                  </p>
-                </div>
-              </div>
-
-              {/* Glacier Point */}
-              <div className="group relative overflow-hidden rounded-2xl bg-gray-800">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <Image
-                    src="https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=800&auto=format&fit=crop"
-                    alt="Glacier Point Wilderness Camp"
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <button className="absolute top-4 right-4 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
-                    </svg>
-                  </button>
-                  <h3 className="text-xl font-bold text-white mb-2">Glacier Point Wilderness Camp</h3>
-                  <p className="text-sm text-gray-300 mb-3 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    Glacier National Park, Montana
-                  </p>
-                  <p className="text-sm text-gray-400 leading-relaxed">
-                    Experience the pristine wilderness of Glacier National Park with stunning mountain vistas and...
-                  </p>
-                </div>
-              </div>
+            {/* View All Link */}
+            <div className="text-center mt-12">
+              <Link
+                href="/"
+                className="inline-flex items-center justify-center rounded-xl bg-green-600 px-8 py-3 text-sm font-semibold text-white shadow-lg hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
+              >
+                View All Campgrounds
+                <svg className="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
             </div>
           </div>
         </section>
